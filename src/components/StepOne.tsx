@@ -1,7 +1,19 @@
 import React, { FC, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { Controller, useForm } from 'react-hook-form';
-import { Button, Chip, FormControl, FormHelperText, InputAdornment, Stack, TextField, Typography } from '@mui/material';
+import {
+    Button,
+    Chip,
+    FormControl,
+    FormControlLabel,
+    FormHelperText,
+    InputAdornment,
+    Radio,
+    RadioGroup,
+    Stack,
+    TextField,
+    Typography,
+} from '@mui/material';
 import { setStep, setStepOneData } from '@/redux/slice';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -13,7 +25,7 @@ const Component: FC<Props> = ({ className }) => {
     const dispatch = useDispatch();
 
     const chipLabels = ['NFT', 'GameFi', 'DeFi', 'DAO', 'SocialFi', 'Metaverse', 'Tools', 'Ecosystem', 'Others'];
-    const [activeChip, setActiveChip] = useState<string>('NFT');
+    const [activeChip, setActiveChip] = useState<string>();
     const stepOneData = useSelector((state: any) => state.funnel.stepOneData);
 
     const {
@@ -43,14 +55,18 @@ const Component: FC<Props> = ({ className }) => {
         setValue('projectName', stepOneData.projectName);
         setValue('projectURL', stepOneData.projectURL);
         setValue('projectCategory', stepOneData.projectCategory);
-        setValue('projectCategory', activeChip);
         setActiveChip(stepOneData.projectCategory);
     }, []);
 
     return (
         <div className={className}>
             <form onSubmit={handleSubmit(onSubmit)}>
-                <FormControl fullWidth variant="outlined" className="form">
+                <FormControl
+                    fullWidth
+                    variant="outlined"
+                    className="form"
+                    error={Boolean(fieldsErrors.projectCategory)}
+                >
                     <Typography color="primary" variant="h6" pb={1}>
                         To Create Quest you need firstly create Project
                     </Typography>
@@ -106,16 +122,26 @@ const Component: FC<Props> = ({ className }) => {
                     <Typography pt={3.5} pb={1.5}>
                         Project Category (It cannot be changed after creation)
                     </Typography>
-                    <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap">
-                        {chipLabels.map((item, index) => (
-                            <Chip
-                                label={item}
-                                key={index}
-                                onClick={() => handleChipClick(item)}
-                                color={item === activeChip ? 'primary' : 'default'}
-                            />
-                        ))}
-                    </Stack>
+                    <Controller
+                        name="projectCategory"
+                        render={({ field }) => (
+                            <RadioGroup {...field} row>
+                                {chipLabels.map((item, index) => (
+                                    <Chip
+                                        className="step-one-chip"
+                                        label={item}
+                                        key={index}
+                                        onClick={() => handleChipClick(item)}
+                                        color={item === activeChip ? 'primary' : 'default'}
+                                    />
+                                ))}
+                            </RadioGroup>
+                        )}
+                        control={control}
+                        rules={{
+                            required: 'Project category required',
+                        }}
+                    />
                     <FormHelperText color="error">
                         {fieldsErrors.projectCategory ? fieldsErrors.projectCategory.message : undefined}
                     </FormHelperText>
@@ -131,5 +157,9 @@ const Component: FC<Props> = ({ className }) => {
 export default styled(Component)`
     .step-one-submit-btn {
         margin-top: ${({ theme }) => theme.spacing(3.5)};
+    }
+
+    .step-one-chip {
+        margin-right: ${({ theme }) => theme.spacing(1)};
     }
 `;
