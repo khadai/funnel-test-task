@@ -1,4 +1,4 @@
-import { Box, Button, Container, Typography } from '@mui/material';
+import { Box, Button, Container, Theme, Typography, useMediaQuery } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
 import React, { FC } from 'react';
 import styled from 'styled-components';
@@ -11,6 +11,8 @@ interface Props {
 }
 
 const Result: FC<Props> = ({ className }) => {
+    const mobile = useMediaQuery((theme: Theme) => theme.breakpoints.down('md'));
+
     const router = useRouter();
     const dispatch = useDispatch();
 

@@ -161,5 +161,6 @@ export default styled(Component)`
 
     .step-one-chip {
         margin-right: ${({ theme }) => theme.spacing(1)};
+        margin-bottom: ${({ theme }) => theme.spacing(0.5)};
     }
 `;

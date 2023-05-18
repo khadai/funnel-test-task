@@ -29,6 +29,4 @@ const Component: FC<Props> = ({ className }) => {
     return <Container className={className}>{stepComponent}</Container>;
 };
 
-export default styled(Component)`
-    margin-top: ${({ theme }) => theme.spacing(12.5)};
-`;
+export default styled(Component)``;
