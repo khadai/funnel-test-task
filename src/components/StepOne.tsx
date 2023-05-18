@@ -2,14 +2,19 @@ import React, { FC, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { Controller, useForm } from 'react-hook-form';
 import { Button, Chip, FormControl, FormHelperText, InputAdornment, Stack, TextField, Typography } from '@mui/material';
+import { setStep, setStepOneData } from '@/redux/slice';
+import { useDispatch, useSelector } from 'react-redux';
 
 interface Props {
     className?: string;
 }
 
 const Component: FC<Props> = ({ className }) => {
+    const dispatch = useDispatch();
+
     const chipLabels = ['NFT', 'GameFi', 'DeFi', 'DAO', 'SocialFi', 'Metaverse', 'Tools', 'Ecosystem', 'Others'];
     const [activeChip, setActiveChip] = useState<string>('NFT');
+    const stepOneData = useSelector((state: any) => state.funnel.stepOneData);
 
     const {
         register,
@@ -26,16 +31,20 @@ const Component: FC<Props> = ({ className }) => {
     });
 
     const onSubmit = (data: { projectName: string; projectURL: string; projectCategory: string }) => {
-        console.log(data);
+        dispatch(setStepOneData(data));
+        dispatch(setStep(2));
     };
-    const handleClick = (item: string) => {
-        console.info('You clicked the Chip.');
+    const handleChipClick = (item: string) => {
         setValue('projectCategory', item);
         setActiveChip(item);
     };
 
     useEffect(() => {
+        setValue('projectName', stepOneData.projectName);
+        setValue('projectURL', stepOneData.projectURL);
+        setValue('projectCategory', stepOneData.projectCategory);
         setValue('projectCategory', activeChip);
+        setActiveChip(stepOneData.projectCategory);
     }, []);
 
     return (
@@ -102,7 +111,7 @@ const Component: FC<Props> = ({ className }) => {
                             <Chip
                                 label={item}
                                 key={index}
-                                onClick={() => handleClick(item)}
+                                onClick={() => handleChipClick(item)}
                                 color={item === activeChip ? 'primary' : 'default'}
                             />
                         ))}

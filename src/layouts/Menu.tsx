@@ -1,7 +1,8 @@
 import React, { FC } from 'react';
 import styled from 'styled-components';
 import { List, MenuList } from '@mui/material';
-import { MenuItem } from '@/components';
+import { MenuItem, StepOne, StepThree, StepTwo } from '@/components';
+import { useSelector } from 'react-redux';
 
 interface Props {
     className?: string;
@@ -9,12 +10,13 @@ interface Props {
 
 const Component: FC<Props> = ({ className }) => {
     const menuItems = ['Start First Project', 'Project Details', 'Create Project'];
+    const activeStep = useSelector((state: any) => state.funnel.step);
 
     return (
         <List className={className}>
             <div className="menu-items">
                 {menuItems.map((item, index) => (
-                    <MenuItem text={item} key={index} />
+                    <MenuItem text={item} key={item} active={activeStep > index} />
                 ))}
             </div>
             <div className="gradient" />

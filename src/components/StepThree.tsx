@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FC, useEffect } from 'react';
 import styled from 'styled-components';
 import {
     Box,
@@ -13,18 +13,24 @@ import {
 } from '@mui/material';
 import { Controller, useForm } from 'react-hook-form';
 import { NumericFormat } from 'react-number-format';
+import { setStep, setStepThreeData } from '@/redux/slice';
+import { useDispatch, useSelector } from 'react-redux';
+import { useRouter } from 'next/router';
 
 interface Props {
     className?: string;
 }
 
 const Component: FC<Props> = ({ className }) => {
+    const dispatch = useDispatch();
+    const router = useRouter();
+    const stepThreeData = useSelector((state: any) => state.funnel.stepThreeData);
+
     const {
         handleSubmit,
         register,
         control,
         setValue,
-        getValues,
         watch,
         formState: { errors: fieldsErrors },
     } = useForm<{ workersAmount: number; launch: string; email: string }>({
@@ -38,7 +44,16 @@ const Component: FC<Props> = ({ className }) => {
 
     const onSubmit = (data: { workersAmount: number; launch: string; email: string }) => {
         console.log(data);
+        dispatch(setStepThreeData(data));
+        router.push({ pathname: 'result' });
     };
+
+    useEffect(() => {
+        setValue('workersAmount', stepThreeData.workersAmount);
+        setValue('launch', stepThreeData.launch);
+        setValue('email', stepThreeData.email);
+    }, []);
+
     return (
         <div className={className}>
             <Typography color="primary" variant="h6" pb={1}>
@@ -135,7 +150,13 @@ const Component: FC<Props> = ({ className }) => {
                         }}
                     />
                     <Box flexDirection="row" display="flex" pt={3.5}>
-                        <Button variant="contained" color="inherit">
+                        <Button
+                            variant="contained"
+                            color="inherit"
+                            onClick={() => {
+                                dispatch(setStep(2));
+                            }}
+                        >
                             Back
                         </Button>
                         <Button variant="contained" color="primary" className="step-one-submit-btn" type="submit">

@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FC, useEffect } from 'react';
 import styled from 'styled-components';
 import {
     Box,
@@ -11,16 +11,22 @@ import {
     Typography,
 } from '@mui/material';
 import { Controller, useForm } from 'react-hook-form';
+import { setStep, setStepTwoData } from '@/redux/slice';
+import { useDispatch, useSelector } from 'react-redux';
 
 interface Props {
     className?: string;
 }
 
 const Component: FC<Props> = ({ className }) => {
+    const dispatch = useDispatch();
+    const stepTwoData = useSelector((state: any) => state.funnel.stepTwoData);
+
     const radioLabels = ['Grow My Community', 'Activate Existing Members', 'Understand My Members', 'Other'];
     const {
         handleSubmit,
         control,
+        setValue,
         formState: { errors: fieldsErrors },
     } = useForm<{ projectGoal: string }>({
         defaultValues: {
@@ -29,8 +35,13 @@ const Component: FC<Props> = ({ className }) => {
     });
 
     const onSubmit = (data: { projectGoal: string }) => {
-        console.log(data);
+        dispatch(setStepTwoData(data));
+        dispatch(setStep(3));
     };
+
+    useEffect(() => {
+        setValue('projectGoal', stepTwoData.projectGoal);
+    }, []);
 
     return (
         <div className={className}>
@@ -60,7 +71,13 @@ const Component: FC<Props> = ({ className }) => {
                         {fieldsErrors.projectGoal ? fieldsErrors.projectGoal.message : undefined}
                     </FormHelperText>
                     <Box flexDirection="row" display="flex" pt={3.5}>
-                        <Button variant="contained" color="inherit">
+                        <Button
+                            variant="contained"
+                            color="inherit"
+                            onClick={() => {
+                                dispatch(setStep(1));
+                            }}
+                        >
                             Back
                         </Button>
                         <Button variant="contained" color="primary" className="step-one-submit-btn" type="submit">
