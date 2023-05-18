@@ -1,7 +1,7 @@
 import React, { FC, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { Controller, useForm } from 'react-hook-form';
-import { Button, Chip, FormControl, InputAdornment, Stack, TextField, Typography } from '@mui/material';
+import { Button, Chip, FormControl, FormHelperText, InputAdornment, Stack, TextField, Typography } from '@mui/material';
 
 interface Props {
     className?: string;
@@ -17,9 +17,15 @@ const Component: FC<Props> = ({ className }) => {
         control,
         setValue,
         formState: { errors: fieldsErrors },
-    } = useForm<{ projectName: string; projectURL: string; projectCategory: string }>();
+    } = useForm<{ projectName: string; projectURL: string; projectCategory: string }>({
+        defaultValues: {
+            projectName: '',
+            projectURL: '',
+            projectCategory: '',
+        },
+    });
 
-    const onSubmit = async (data: { projectName: string; projectURL: string; projectCategory: string }) => {
+    const onSubmit = (data: { projectName: string; projectURL: string; projectCategory: string }) => {
         console.log(data);
     };
     const handleClick = (item: string) => {
@@ -101,6 +107,9 @@ const Component: FC<Props> = ({ className }) => {
                             />
                         ))}
                     </Stack>
+                    <FormHelperText color="error">
+                        {fieldsErrors.projectCategory ? fieldsErrors.projectCategory.message : undefined}
+                    </FormHelperText>
                     <Button variant="contained" color="primary" className="step-one-submit-btn" type="submit">
                         Add Project
                     </Button>

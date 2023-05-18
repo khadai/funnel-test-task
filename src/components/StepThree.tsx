@@ -5,63 +5,145 @@ import {
     Button,
     FormControl,
     FormControlLabel,
-    FormLabel,
+    FormHelperText,
     Radio,
     RadioGroup,
     TextField,
     Typography,
 } from '@mui/material';
+import { Controller, useForm } from 'react-hook-form';
+import { NumericFormat } from 'react-number-format';
 
 interface Props {
     className?: string;
 }
 
 const Component: FC<Props> = ({ className }) => {
-    const [value, setValue] = React.useState('female');
-    const radioLabels = ['Grow My Community', 'Activate Existing Members', 'Understand My Members', 'Other'];
+    const {
+        handleSubmit,
+        register,
+        control,
+        setValue,
+        getValues,
+        watch,
+        formState: { errors: fieldsErrors },
+    } = useForm<{ workersAmount: number; launch: string; email: string }>({
+        defaultValues: {
+            workersAmount: 0,
+            launch: '',
+            email: '',
+        },
+    });
+    const workersAmount = watch('workersAmount');
 
-    const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setValue((event.target as HTMLInputElement).value);
+    const onSubmit = (data: { workersAmount: number; launch: string; email: string }) => {
+        console.log(data);
     };
-
     return (
         <div className={className}>
             <Typography color="primary" variant="h6" pb={1}>
                 Create Project
             </Typography>
-            <Typography variant="h4" pb={2}>
-                How many full-time workers on the project?
-            </Typography>
-            <Box flexDirection="row" display="flex">
-                <Button variant="contained" color="inherit">
-                    -
-                </Button>
-                <TextField size="small" inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }} />
-                <Button variant="contained" color="inherit">
-                    +
-                </Button>
-            </Box>
-            <Typography variant="h4" pt={3.5} pb={2}>
-                Are you pre or post product launch?
-            </Typography>
-            <FormControl>
-                <RadioGroup value={value} onChange={handleChange}>
-                    <FormControlLabel value="pre" control={<Radio />} label="Pre Product" />
-                    <FormControlLabel value="post" control={<Radio />} label="Post Product" />
-                </RadioGroup>
-            </FormControl>
-            <Typography variant="h4" pb={2} pt={3.5}>
-                Contact Email
-            </Typography>
-            <TextField size="small" fullWidth />
-            <Box flexDirection="row" display="flex" pt={3.5}>
-                <Button variant="contained" color="inherit">
-                    Back
-                </Button>
-                <Button variant="contained" color="primary" className="step-one-submit-btn">
-                    Create Project
-                </Button>
-            </Box>
+            <form onSubmit={handleSubmit(onSubmit)}>
+                <FormControl error={Boolean(fieldsErrors)}>
+                    <Typography variant="h4" pb={2}>
+                        How many full-time workers on the project?
+                    </Typography>
+                    <Box flexDirection="row" display="flex">
+                        <Button
+                            variant="contained"
+                            color="inherit"
+                            disabled={workersAmount <= 0}
+                            onClick={() => setValue('workersAmount', workersAmount - 1)}
+                        >
+                            -
+                        </Button>
+                        <Controller
+                            name="workersAmount"
+                            render={({ field: { onChange, name, value } }) => (
+                                <NumericFormat
+                                    name={name}
+                                    value={value}
+                                    onChange={onChange}
+                                    customInput={TextField}
+                                    thousandSeparator
+                                    allowNegative={false}
+                                    error={Boolean(fieldsErrors.workersAmount)}
+                                />
+                            )}
+                            control={control}
+                            rules={{
+                                required: 'Amount required',
+                                min: {
+                                    value: 0,
+                                    message: 'Amount must be a positive number',
+                                },
+                            }}
+                        />
+                        <Button
+                            variant="contained"
+                            color="inherit"
+                            onClick={() => setValue('workersAmount', workersAmount + 1)}
+                        >
+                            +
+                        </Button>
+                    </Box>
+                    <FormHelperText>
+                        {fieldsErrors.workersAmount ? fieldsErrors.workersAmount.message : undefined}
+                    </FormHelperText>
+                    <Typography variant="h4" pt={3.5} pb={2}>
+                        Are you pre or post product launch?
+                    </Typography>
+                    <Controller
+                        name="launch"
+                        render={({ field }) => (
+                            <RadioGroup {...field}>
+                                <FormControlLabel value="pre" control={<Radio />} label="Pre Product" />
+                                <FormControlLabel value="post" control={<Radio />} label="Post Product" />
+                            </RadioGroup>
+                        )}
+                        control={control}
+                        rules={{
+                            required: 'Launch type required',
+                        }}
+                    />
+                    <FormHelperText>{fieldsErrors.launch ? fieldsErrors.launch.message : undefined}</FormHelperText>
+                    <Typography variant="h4" pb={2} pt={3.5}>
+                        Contact Email
+                    </Typography>
+                    <Controller
+                        name="email"
+                        render={({ field }) => (
+                            <TextField
+                                {...field}
+                                id="projectName"
+                                size="small"
+                                placeholder="Enter your email"
+                                helperText={fieldsErrors.email ? fieldsErrors.email.message : undefined}
+                                error={Boolean(fieldsErrors.email)}
+                                InputLabelProps={{ shrink: true }}
+                                {...register('email')}
+                            />
+                        )}
+                        control={control}
+                        rules={{
+                            required: 'Email required',
+                            pattern: {
+                                value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                                message: 'Invalid email address',
+                            },
+                        }}
+                    />
+                    <Box flexDirection="row" display="flex" pt={3.5}>
+                        <Button variant="contained" color="inherit">
+                            Back
+                        </Button>
+                        <Button variant="contained" color="primary" className="step-one-submit-btn" type="submit">
+                            Create Project
+                        </Button>
+                    </Box>
+                </FormControl>
+            </form>
         </div>
     );
 };

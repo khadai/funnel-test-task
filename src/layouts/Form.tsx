@@ -10,11 +10,13 @@ interface Props {
 const Component: FC<Props> = ({ className }) => {
     return (
         <Container className={className}>
-            <StepOne />
+            {/*<StepOne />*/}
             {/*<StepTwo />*/}
-            {/*<StepThree />*/}
+            <StepThree />
         </Container>
     );
 };
 
-export default styled(Component)``;
+export default styled(Component)`
+    margin-top: ${({ theme }) => theme.spacing(12.5)};
+`;
